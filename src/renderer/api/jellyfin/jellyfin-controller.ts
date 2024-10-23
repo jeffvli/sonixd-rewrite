@@ -293,10 +293,14 @@ export const JellyfinController: ControllerEndpoint = {
                 userId: apiClientProps.server?.userId,
             },
             query: {
-                AlbumArtistIds: query.artistIds
-                    ? formatCommaDelimitedString(query.artistIds)
-                    : undefined,
-                ContributingArtistIds: query.compilation ? query.artistIds?.[0] : undefined,
+                ...(!query.compilation &&
+                    query.artistIds && {
+                        AlbumArtistIds: formatCommaDelimitedString(query.artistIds),
+                    }),
+                ...(query.compilation &&
+                    query.artistIds && {
+                        ContributingArtistIds: query.artistIds[0],
+                    }),
                 GenreIds: query.genres ? query.genres.join(',') : undefined,
                 IncludeItemTypes: 'MusicAlbum',
                 IsFavorite: query.favorite,
