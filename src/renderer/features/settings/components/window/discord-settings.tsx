@@ -4,12 +4,17 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useDiscordSetttings, useSettingsStoreActions } from '/@/renderer/store';
+import {
+    useDiscordSetttings,
+    useSettingsStoreActions,
+    useGeneralSettings,
+} from '/@/renderer/store';
 import { useTranslation } from 'react-i18next';
 
 export const DiscordSettings = () => {
     const { t } = useTranslation();
     const settings = useDiscordSetttings();
+    const generalSettings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
 
     const discordOptions: SettingOption[] = [
@@ -139,6 +144,31 @@ export const DiscordSettings = () => {
             }),
             isHidden: !isElectron(),
             title: t('setting.discordListening', {
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <TextInput
+                    defaultValue={generalSettings.lastfmApiKey}
+                    onBlur={(e) => {
+                        setSettings({
+                            general: {
+                                ...generalSettings,
+                                lastfmApiKey: e.currentTarget.value,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.lastfmApiKey', {
+                context: 'description',
+                lastfm: 'Last.fm',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.lastfmApiKey', {
+                lastfm: 'Last.fm',
                 postProcess: 'sentenceCase',
             }),
         },

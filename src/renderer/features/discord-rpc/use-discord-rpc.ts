@@ -5,6 +5,7 @@ import {
     useCurrentSong,
     useCurrentStatus,
     useDiscordSetttings,
+    useGeneralSettings,
     usePlayerStore,
 } from '/@/renderer/store';
 import { SetActivity } from '@xhayper/discord-rpc';
@@ -16,6 +17,7 @@ const discordRpc = isElectron() ? window.electron.discordRpc : null;
 export const useDiscordRpc = () => {
     const intervalRef = useRef(0);
     const discordSettings = useDiscordSetttings();
+    const generalSettings = useGeneralSettings();
     const currentSong = useCurrentSong();
     const currentStatus = useCurrentStatus();
 
@@ -67,6 +69,19 @@ export const useDiscordRpc = () => {
             activity.largeImageKey = song?.imageUrl;
         }
 
+        if (generalSettings.lastfmApiKey && song?.album && song?.artists.length) {
+            console.log('Fetching album info for', song.album, song.artists[0].name);
+            const albumInfo = await fetch(
+                `http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${generalSettings.lastfmApiKey}&artist=${encodeURIComponent(song.artistName)}&album=${encodeURIComponent(song.album)}&format=json`,
+            );
+
+            const albumInfoJson = await albumInfo.json();
+
+            if (albumInfoJson.album?.image?.[3]['#text']) {
+                activity.largeImageKey = albumInfoJson.album.image[3]['#text'];
+            }
+        }
+
         // Fall back to default icon if not set
         if (!activity.largeImageKey) {
             activity.largeImageKey = 'icon';
@@ -79,6 +94,7 @@ export const useDiscordRpc = () => {
         discordSettings.enableIdle,
         discordSettings.showAsListening,
         discordSettings.showServerImage,
+        generalSettings.lastfmApiKey,
     ]);
 
     useEffect(() => {
