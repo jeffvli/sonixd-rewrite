@@ -24,15 +24,14 @@ const getCoverArtUrl = (args: {
         return null;
     }
 
-    const url =
+    return (
         `${args.baseUrl}/rest/getCoverArt.view` +
         `?id=${args.coverArtId}` +
-        `&${encodeURIComponent(args.credential || '')}` +
+        `&${args.credential}` +
         '&v=1.13.0' +
         '&c=feishin' +
-        `&size=${size}`;
-
-    return url;
+        `&size=${size}`
+    );
 };
 
 const normalizeSong = (
@@ -49,7 +48,7 @@ const normalizeSong = (
             size: size || 300,
         }) || null;
 
-    const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${encodeURIComponent(server?.credential || '')}`;
+    const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server?.credential}`;
 
     return {
         album: item.album || '',
