@@ -27,6 +27,7 @@ import {
     Rectangle,
     screen,
 } from 'electron';
+import ElectronShutdownHandler from '@paymoapp/electron-shutdown-handler';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log/main';
 import { autoUpdater } from 'electron-updater';
@@ -375,6 +376,18 @@ const createWindow = async (first = true) => {
     }
 
     mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+    ElectronShutdownHandler.setWindowHandle(mainWindow.getNativeWindowHandle());
+    ElectronShutdownHandler.blockShutdown('Please wait for some data to be saved');
+
+    ElectronShutdownHandler.on('shutdown', () => {
+        console.log('Shutting down!');
+        ElectronShutdownHandler.releaseShutdown();
+        if (mainWindow) {
+            ElectronShutdownHandler.releaseShutdown();
+            mainWindow.close();
+        }
+    });
 
     const startWindowMinimized = store.get('window_start_minimized', false) as boolean;
 
