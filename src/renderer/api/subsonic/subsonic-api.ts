@@ -295,12 +295,12 @@ export const ssApiClient = (args: {
                 const token = server.credential;
                 const params = token.split(/&?\w=/gm);
 
-                authParams.u = server.username;
+                authParams.u = decodeURIComponent(server.username);
                 if (params?.length === 4) {
                     authParams.s = params[2];
                     authParams.t = params[3];
                 } else if (params?.length === 3) {
-                    authParams.p = params[2];
+                    authParams.p = decodeURIComponent(params[2]);
                 }
             } else {
                 baseUrl = url;
